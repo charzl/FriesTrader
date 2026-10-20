@@ -2,8 +2,10 @@
 
 _Part of [FriesTrader](https://github.com/YizhiSong/FriesTrader), Copyright (c) 2026 Yizhi Song, MIT License._
 
-Automated subset of this pipeline (see `README.md`), run every weekday
-4:30pm Central as a cloud routine.
+Automated subset of this pipeline (see `README.md`), run every NYSE trading
+day at 3:00am America/Los_Angeles, before the market opens. The screening
+session uses the latest completed regular-session close as its price anchor;
+pre-market and overnight trades are not interchangeable with that close.
 
 Performs **ONLY Steps 1–3**. **NEVER** Step 4 (re-verify), 5 (risk
 enforcement), 6 (dry run/order review), or 7 (`trade_log.jsonl`) — those
@@ -41,9 +43,16 @@ block, and cap the **watchlist-sourced, non-held** portion at
 already bounds its own contribution, so this cap only ever applies to
 watchlist candidates.
 
-Pull current prices for the capped candidate list via `get_equity_quotes`
-(batched into one call), fresh every run. Use `last_trade_price` as
-`current_price` in Steps 2–3.
+Pull prices for the capped candidate list via `get_equity_quotes`, fresh every
+run, in batches of at most 20 symbols so the official close lookup is included.
+Use each `results[].close.price` (the official settled price for the latest
+completed regular session) as `current_price` in Steps 1–3 and record its
+`close.date`. Confirm the close date belongs to the latest completed XNYS
+session; do not substitute `last_non_reg_trade_price` or a pre-market quote.
+If the official close is missing, use `quote.previous_close` only when
+`previous_close_date` matches that session, and log the fallback. If neither
+price is valid, do not invent a price or pass a price-dependent signal; keep
+held positions in the universe as required and record the data failure.
 
 Pull price history per candidate via `get_equity_historicals`
 (`interval="day"`, spanning the last ~300 calendar days — enough to

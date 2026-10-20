@@ -59,10 +59,9 @@ nervous. Here's what actually stands between a thesis and an order:
 
 ## How it works
 
-Trading runs as **two separate phases, on two separate schedules** — a
-full trading day's closing data feeds the thesis, and a fresh opening
-price is used for the actual order, rather than trading on a stale
-overnight price.
+Trading runs as **two separate phases, on two separate schedules** —
+early-morning screening uses the most recent completed regular-session close,
+and a new opening price is used for the order review.
 
 ```mermaid
 graph TD
@@ -80,8 +79,9 @@ graph TD
 Only one step is a judgment call — the Phase A thesis. Every filter,
 ranking, and size is a deterministic script.
 
-**Phase A — screen and write a thesis** (Steps 1–3, ~4:30pm Central
-weekdays; spec `PHASE_A_TASK.md`). Places no orders.
+**Phase A — screen and write a thesis** (Steps 1–3, 3:00am
+America/Los_Angeles on NYSE trading days; spec `PHASE_A_TASK.md`). Places no
+orders.
 
 1. **Universe.** Start with your watchlist (up to
    `universe.watchlist_max_candidates`), plus up to
@@ -287,10 +287,10 @@ This template gets improvements over time.
 
 ## Running it
 
-Two schedules need to fire: Phase A around 4:30pm Central on weekdays
-(hand Claude Code `PHASE_A_TASK.md` to execute), and Phase B around
-8:35am Central on weekdays, 5 minutes after market open (hand it
-`PHASE_B_TASK.md`). Each run is a fresh Claude Code session pointed at
+Two schedules need to fire: Phase A at 3:00am America/Los_Angeles on NYSE
+trading days (hand the agent `PHASE_A_TASK.md` to execute), and Phase B at
+8:35am Central on trading days, 5 minutes after market open (hand it
+`PHASE_B_TASK.md`). Each run is a fresh agent session pointed at
 this repo — no state needs to persist locally between runs, since the
 repo itself (`risk_rules.json`, `pending_proposals.jsonl`,
 `trade_log.jsonl`) is what's read and written each time.
@@ -326,7 +326,7 @@ First, determine today's REAL date, day-of-week, and time-of-day in America/Chic
 TZ='America/Chicago' date +'%Y-%m-%d'
 TZ='America/Chicago' date +'%A'
 TZ='America/Chicago' date +'%H:%M:%S'
-Use the date as the 'date' field and the time as the 'timestamp' field (time-of-day only, e.g. "16:30:01" — never prepend the date to it) on every line you write, per PHASE_A_TASK.md's Output section.
+Use the date as the 'date' field and the time as the 'timestamp' field (time-of-day only, e.g. "05:00:01" — never prepend the date to it) on every line you write, per PHASE_A_TASK.md's Output section.
 
 Read risk_rules.json fresh from this checkout every run — never assume prior values or cache across runs.
 

@@ -244,7 +244,9 @@ improvements.
    positions, orders, etc.) goes through it.
 2. Fill in `account_number` in `risk_rules.json` with your own Robinhood
    account number, set `universe.watchlist_name` to a watchlist you've
-   already created and populated in your Robinhood account, and review
+   already created and populated in your Robinhood account, and set
+   `universe.watchlist_id` to that list's ID from `get_watchlists` so a
+   later rename won't break the schedule. Review
    every other threshold — the defaults here are illustrative, not a
    recommendation.
 3. Create a scan via the Robinhood MCP's `create_scan` tool — whatever

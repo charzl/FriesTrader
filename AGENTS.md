@@ -42,9 +42,10 @@ screening and `PHASE_B_TASK.md` for risk checks and logging.
 ## Before running
 
 Verify `get_accounts` still permits this agent to access the configured
-account. Resolve the configured watchlist by name and verify the saved scan
-exists. If required account or market data is unavailable, report the exact
-failure and halt affected entries, as specified in Phase B.
+account. Resolve the configured watchlist by stable ID when present (name is
+only a fallback) and verify the saved scan exists. If required account or
+market data is unavailable, report the exact failure and halt affected
+entries, as specified in Phase B.
 
 The full account identifiers in `risk_rules.json` are local personal data.
 Do not commit or push this file with its populated identifiers.

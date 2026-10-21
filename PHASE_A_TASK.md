@@ -15,11 +15,17 @@ not attempt them anyway.
 
 ## Step 1 — Build the watchlist
 
-Pull symbols from the Robinhood watchlist named `universe.watchlist_name`
-in `risk_rules.json` (read fresh each run — don't assume prior values or
-hardcode the name). Call `get_watchlists` to find its `list_id` by
-matching `display_name`, then `get_watchlist_items` on that `list_id` —
-ignore all other watchlists.
+Pull symbols from the Robinhood watchlist configured in `risk_rules.json`
+(read fresh each run — don't assume prior values or hardcode the ID). Call
+`get_watchlists` and select the entry whose `id` equals
+`universe.watchlist_id` when that field is present and non-empty. The ID
+remains stable when the list is renamed; log the returned `display_name`
+if it differs from `universe.watchlist_name`. If `watchlist_id` is absent
+or empty, find the list by matching `display_name` to
+`universe.watchlist_name`. Then call
+`get_watchlist_items` on that one `list_id` and ignore other watchlists.
+If neither lookup resolves, halt Phase A rather than silently changing
+the candidate universe.
 
 **Supplementary market scan** (additive, not a replacement): call
 `run_scan` with `universe.supplementary_scan_id` — a saved Robinhood
